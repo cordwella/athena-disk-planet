@@ -115,9 +115,18 @@ class MeshBlock {
   AthenaArray<Real> user_out_var;
   std::string *user_out_var_names_;
 
+  // user X1 output variables for analysis
+  int nuser_x1out_var;
+  AthenaArray<Real> user_x1out_var;
+  std::string *user_x1out_var_names_;
+
   // user MeshBlock data that can be stored in restart files
   AthenaArray<Real> *ruser_meshblock_data;
   AthenaArray<int> *iuser_meshblock_data;
+
+  // user X1MeshBlock data that can be stored in restart files
+  AthenaArray<Real> *ruser_x1meshblock_data;
+  AthenaArray<int> *iuser_x1meshblock_data;
 
   // mesh-related objects
   Coordinates *pcoord;
@@ -180,6 +189,7 @@ class MeshBlock {
   int nreal_user_meshblock_data_, nint_user_meshblock_data_;
   std::vector<std::reference_wrapper<AthenaArray<Real>>> vars_cc_;
   std::vector<std::reference_wrapper<FaceField>> vars_fc_;
+  int nreal_user_x1meshblock_data_, nint_user_x1meshblock_data_;
 
   // functions
   void AllocateRealUserMeshBlockDataField(int n);
@@ -187,6 +197,12 @@ class MeshBlock {
   void AllocateUserOutputVariables(int n);
   void SetUserOutputVariableName(int n, const char *name);
   void SetCostForLoadBalancing(double cost);
+
+  void AllocateRealUserX1MeshBlockDataField(int n);
+  void AllocateIntUserX1MeshBlockDataField(int n);
+  void AllocateUserX1OutputVariables(int n);
+  void SetUserX1OutputVariableName(int n, const char *name);
+
 
   //! defined in either the prob file or default_pgen.cpp in ../pgen/
   void ProblemGenerator(ParameterInput *pin);
@@ -282,6 +298,8 @@ class Mesh {
 
   AthenaArray<Real> *ruser_mesh_data;
   AthenaArray<int> *iuser_mesh_data;
+
+  CustomApplyUserWorkBeforeOutputFunction CustomAUWBO_;
 
   // functions
   void Initialize(int res_flag, ParameterInput *pin);
@@ -422,6 +440,9 @@ class Mesh {
   void EnrollUserCRBoundaryFunction(BoundaryFace face, CRBoundaryFunc my_func);
 
   void EnrollUserMGCRDiffusionBoundaryFunction(BoundaryFace dir, MGBoundaryFunc my_bc);
+
+  void EnrollCustomApplyUserWorkBeforeOutput(CustomApplyUserWorkBeforeOutputFunction my_func);
+
 
   //! \deprecated (felker):
   //! * provide trivial overload for old-style BoundaryFace enum argument

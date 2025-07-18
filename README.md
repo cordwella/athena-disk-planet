@@ -1,17 +1,33 @@
-athena
+athena-disk-planet
 ======
-<!-- Jenkins Status Badge in Markdown (with view), unprotected, flat style -->
-<!-- In general, need to be on Princeton VPN, logged into Princeton CAS, with ViewStatus access to Jenkins instance to click on unprotected Build Status Badge, but server is configured to whitelist GitHub -->
-<!-- [![Jenkins Build Status](https://jenkins.princeton.edu/buildStatus/icon?job=athena/PrincetonUniversity_athena_jenkins_master)](https://jenkins.princeton.edu/job/athena/job/PrincetonUniversity_athena_jenkins_master/) -->
-[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.11660592.svg)](https://doi.org/10.5281/zenodo.11660592)
-[![codecov](https://codecov.io/gh/PrincetonUniversity/athena/branch/master/graph/badge.svg?token=ZzniY084kP)](https://codecov.io/gh/PrincetonUniversity/athena)
-[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.0-4baaaa.svg)](code_of_conduct.md)
+Modified version of Athena++ for planet-disc interactions. Pairs nicely with [this disc\_planet\_analysis](https://github.com/cordwella/disc_planet_analysis) code. 
 
-<!--[![Public GitHub  issues](https://img.shields.io/github/issues/PrincetonUniversity/athena-public-version.svg)](https://github.com/PrincetonUniversity/athena-public-version/issues)
-[![Public GitHub pull requests](https://img.shields.io/github/issues-pr/PrincetonUniversity/athena-public-version.svg)](https://github.com/PrincetonUniversity/athena-public-version/pulls) -->
+Please see the [Athena++ main GitHub](https://github.com/PrincetonUniversity/athena) for 
+up to date changes on the underlying hydrodynamics code.
 
+## New feature overview
+This fork adds two new problem files, `diskplanet_3d_sph.cpp` and `diskplanet_2d.cpp`, and two additional utilities, one for the calculation of Bessel functions based off the Cephes library and the other for a custom radial output type (this is used in `diskplanet_2d.cpp` to output $F\_wave$ and $dT/dR$, and originally written for Cimerman & Rafikov 2021). In addition, compile scripts, slurm scripts, and input files are provided. These are designed for the University of Cambridge Faculty of Mathematics's [Swirles HPC Cluster](https://www.maths.cam.ac.uk/computing/faculty-hpc-system-swirles), but more generally I hope they can be used as a starting point for researchers begining to use Athena++ for planet-disc interaction problems. Those scripts can be found in the `cambridge_scripts` directory.
+
+It also adds a 1D output for 2D simulations. This output code is based on that of Nicolas Cimerman, developed for Cimerman & Rafikov (2021), "Planet-driven density waves in protoplanetary discs: Numerical verification of non-linear evolution theory"
+
+### Setting up 2D planet-disc simulations
+
+The potential $\Phi_{B, H\_p}$ is reccomended. Set this using
+```
+potential_order = -2 
+```
+if instead you must the traditional second order smoothed potential use
+```
+potential_order = 2
+eps = 0.65
+```
+where `eps` is set to your smoothing length (0.65 is reccomended for the best match to the one-sided Lindblad torque).
+
+## Citing this repository
+
+Please first cite the main Athena++ repository and paper (details below) and then cite that you have used problem files generated for Cordwell, Ziampras, Brown & Rafikov (2025). Cordwell et al (2025) is also the correct citation for disc\_planet\_analysis.
+
+# The original Athena++ README.md is as follows
 <p align="center">
 	  <img width="345" height="345" src="https://user-images.githubusercontent.com/1410981/115276281-759d8580-a108-11eb-9fc9-833480b97f95.png">
 </p>

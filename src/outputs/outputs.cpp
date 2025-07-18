@@ -710,6 +710,49 @@ void OutputType::LoadOutputData(MeshBlock *pmb) {
       }
     }
   }
+
+  // start NC: Custom X1-Output variables
+  if (output_params.variable.compare(0, 4, "x1av") == 0
+   || output_params.variable.compare(0, 13, "x1user_out_av") == 0) {
+    int iv, ns=0, ne=pmb->nuser_x1out_var-1;
+    if (sscanf(output_params.variable.c_str(), "x1av%d", &iv)>0) {
+      if (iv>=0 && iv<pmb->nuser_x1out_var)
+        ns=iv, ne=iv;
+    } else if (sscanf(output_params.variable.c_str(), "x1user_out_av%d", &iv)>0) {
+      if (iv>=0 && iv<pmb->nuser_x1out_var)
+        ns=iv, ne=iv;
+    }
+    for (int n = ns; n <= ne; ++n) {
+      pod = new OutputData;
+      pod->type = "SCALARS";
+      if (pmb->user_x1out_var_names_[n].length()!=0) {
+        pod->name=pmb->user_x1out_var_names_[n];
+      } else {
+        char vn[16];
+        sprintf(vn, "x1user_out_av%d", n);
+        pod->name = vn;
+      }
+      pod->data.InitWithShallowSlice(pmb->user_x1out_var,4,n,1); // NC: Potentially critical TODO
+      AppendOutputDataNode(pod);
+      num_vars_++;
+    }
+  }
+
+  for (int n = 0; n < pmb->nuser_x1out_var; ++n) {
+    if (pmb->user_x1out_var_names_[n].length()!=0) {
+      if (output_params.variable.compare(pmb->user_x1out_var_names_[n]) == 0) {
+        pod = new OutputData;
+        pod->type = "SCALARS";
+        pod->name=pmb->user_x1out_var_names_[n];
+        pod->data.InitWithShallowSlice(pmb->user_x1out_var,4,n,1); // NC: Potentially critical TODO
+        AppendOutputDataNode(pod);
+        num_vars_++;
+      }
+    }
+  }
+  // end NC: Custom X1-Output variables
+
+  
   // The following radiation/cosmic ray/thermal conduction are all
   // cell centered variable
   if (NR_RADIATION_ENABLED || IM_RADIATION_ENABLED) {

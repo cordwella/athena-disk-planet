@@ -1611,9 +1611,27 @@ void Mesh::AllocateIntUserMeshDataField(int n) {
 //! \brief Apply MeshBlock::UserWorkBeforeOutput
 
 void Mesh::ApplyUserWorkBeforeOutput(ParameterInput *pin) {
-  for (int i=0; i<nblocal; ++i)
-    my_blocks(i)->UserWorkBeforeOutput(pin);
+  if (CustomAUWBO_ == nullptr) {
+    // Note(AJC): This what A++ had before I edited it. I've added the override
+    // so that I don't break any other part of the code.
+    for (int i=0; i<nblocal; ++i)
+      my_blocks(i)->UserWorkBeforeOutput(pin);
+  } else{
+    CustomAUWBO_(this, pin);
+  }
 }
+
+//----------------------------------------------------------------------------------------
+//! \fn void Mesh::EnrollCustomApplyUserWorkBeforeOutput(ParameterInput *pin)
+//! \brief Apply Enroll arbitrary function for on the fly analysis
+
+void Mesh::EnrollCustomApplyUserWorkBeforeOutput(CustomApplyUserWorkBeforeOutputFunction my_func) {
+  CustomAUWBO_ = my_func;
+  return;
+}
+
+
+
 
 //----------------------------------------------------------------------------------------
 //! \fn void Mesh::Initialize(int res_flag, ParameterInput *pin)

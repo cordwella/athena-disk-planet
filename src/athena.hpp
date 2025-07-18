@@ -45,6 +45,7 @@ using Real = double;
 #define CACHELINE_BYTES 64
 
 // forward declarations needed for function pointer type aliases
+class Mesh;
 class MeshBlock;
 class Coordinates;
 class ParameterInput;
@@ -259,5 +260,6 @@ using CRBoundaryFunc = void (*)(
 using CRSrcTermFunc = void (*)(
     MeshBlock *pmb, const Real time, const Real dt,
     const AthenaArray<Real> &prim, FaceField &b, AthenaArray<Real> &u_cr);
-
+using CustomApplyUserWorkBeforeOutputFunction = void (*)(
+    Mesh *pmesh, ParameterInput *pin);
 #endif // ATHENA_HPP_

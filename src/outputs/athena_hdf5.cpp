@@ -102,6 +102,10 @@ void ATHDF5Output::WriteOutputFile(Mesh *pm, ParameterInput *pin, bool flag) {
   bool *active_flags = new bool[max_blocks_local];
   std::string variable = output_params.variable;
 
+  bool x1avout = (variable.compare(0,4,"x1av") == 0
+                || variable.compare(0,13,"x1user_out_av") == 0); // NC: x1av output
+
+
   for (int i=0; i<max_blocks_local; i++)
     active_flags[i] = true;
 
@@ -196,6 +200,8 @@ void ATHDF5Output::WriteOutputFile(Mesh *pm, ParameterInput *pin, bool flag) {
     else if (variable.compare(0,3,"uov") == 0
              || variable.compare(0,12,"user_out_var") == 0)
       std::strncpy(dataset_names[n_dataset_names++], "user_out_var", max_name_length+1);
+    else if (x1avout)
+      std::strncpy(dataset_names[n_dataset_names++], "x1user_out_av", max_name_length+1);
     else
       std::strncpy(dataset_names[n_dataset_names++], "hydro", max_name_length+1);
   }
@@ -313,6 +319,11 @@ void ATHDF5Output::WriteOutputFile(Mesh *pm, ParameterInput *pin, bool flag) {
   if (output_params.output_sumx2) nx2=1;
   if (output_params.output_sumx3) nx3=1;
 
+  if (x1avout) { // NC: Custom X1 output variable
+    nx2 = 1;
+    nx3 = 1;
+  }
+
   // Allocate contiguous buffers for data in memory
   levels_mesh = new int[num_blocks_local];
   locations_mesh = new std::int64_t[num_blocks_local * 3];
@@ -357,7 +368,10 @@ void ATHDF5Output::WriteOutputFile(Mesh *pm, ParameterInput *pin, bool flag) {
       locations_mesh[nba*3 + 0] = pmb->loc.lx1;
       locations_mesh[nba*3 + 1] = pmb->loc.lx2;
       locations_mesh[nba*3 + 2] = pmb->loc.lx3;
-
+      if (x1avout) { // NC: Custom X1 output variable
+        out_ke = out_ks = 0;
+        out_je = out_js = 0;
+      }
       // Load coordinates
       if (output_params.output_slicex1) {
         x1f_mesh[nba*(nx1+1)] =
@@ -386,7 +400,7 @@ void ATHDF5Output::WriteOutputFile(Mesh *pm, ParameterInput *pin, bool flag) {
             = static_cast<H5Real>(pmb->pcoord->x2f(output_params.jslice+1));
         x2v_mesh[nba*nx2]
             = static_cast<H5Real>(pmb->pcoord->x2v(output_params.jslice));
-      } else if (output_params.output_sumx2) {
+      } else if (output_params.output_sumx2 || x1avout) {
         x2f_mesh[nba*(nx2+1)] = pmb->pcoord->x2f(pmb->js);
         x2f_mesh[nba*(nx2+1)+1] = pmb->pcoord->x2f(pmb->je+1);
         if (pmb->block_size.nx2 % 2 == 0) {
@@ -407,7 +421,7 @@ void ATHDF5Output::WriteOutputFile(Mesh *pm, ParameterInput *pin, bool flag) {
             = static_cast<H5Real>(pmb->pcoord->x3f(output_params.kslice+1));
         x3v_mesh[nba*nx3]
             = static_cast<H5Real>(pmb->pcoord->x3v(output_params.kslice));
-      } else if (output_params.output_sumx3) {
+      } else if (output_params.output_sumx3  || x1avout) {
         x3f_mesh[nba*(nx3+1)] = pmb->pcoord->x3f(pmb->ks);
         x3f_mesh[nba*(nx3+1)+1] = pmb->pcoord->x3f(pmb->ke+1);
         if (pmb->block_size.nx3 % 2 == 0) {
