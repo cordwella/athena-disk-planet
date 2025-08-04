@@ -1,0 +1,100 @@
+<comment>
+problem   = 3D Planet Disc interaction
+reference = 
+configure = --prob=diskplanet_3d_sph --flux roe --coord=spherical_polar --eos isothermal -hdf5 --cxx h5c++
+
+<job>
+problem_id  = disksph      # problem ID: basename of output filenames
+
+
+<output1>
+file_type        = hdf5          # All data
+variable         = cons          
+dt               = 6.283185307e0
+
+<output2>
+file_type   = hst       # History data dump
+dt          = 0.0628    # time increment between outputs
+
+<output3>
+file_type        = hdf5           # Midplane data dump
+variable         = cons           #
+dt               = 6.283185307e-1
+x3_sum           = true
+x2_slice         = 1.5706
+
+<output4>
+file_type        = hdf5           # Summed data dump
+variable         = cons           #
+dt               = 6.283185307e-1
+x2_sum           = true
+x3_sum           = true
+
+<output5>
+file_type        = rst           # Restart file
+dt               = 6.283185307e1
+
+<time>
+cfl_number  = 0.4       # The Courant, Friedrichs, & Lewy (CFL) Number
+nlim        = -1        # cycle limit
+tlim        = 252       # time limit 40 orbits
+integrator  = rk2   # time integration algorithm
+xorder      = 2     # order of spatial reconstruction
+ncycle_out  = 1         # interval for stdout summary info
+
+<mesh>
+nx1         = 900       # Number of zones in X1-direction
+x1min       = 0.4       # minimum value of X1
+x1max       = 2.5       # maximum value of X1
+ix1_bc      = user      # Inner-X1 boundary condition flag
+ox1_bc      = user      # Outer-X1 boundary condition flag
+x1rat       = 1.0020382760926902    # non-uniform grid ratio
+
+nx2         = 78        # Number of zones in X2-direction
+x2min       = 1.4207963267948966    # minimum value of X2 NOTE: THIS IS SET PER H_p
+# should cover 3 h_p, currently set to 13 cells per scale height
+# later will be 26 per scale height
+x2max       = 1.7207963267948965    # maximum value of X2
+ix2_bc      = user      # Inner-X2 boundary condition flag
+ox2_bc      = user      # Outer-X2 boundary condition flag
+
+nx3         = 1800            # Number of zones in X3-direction
+x3min       = 0.0            # minimum value of X3
+x3max       = 6.2831853071795862  # maximum value of X3
+ix3_bc      = periodic       # Inner-X3 boundary condition flag
+ox3_bc      = periodic       # Outer-X3 boundary condition flag
+num_threads = 54
+
+refinement  = None
+
+<hydro>
+gamma           = 1.0001 # gamma = C_p/C_v
+iso_sound_speed = 0.05        # isothermal sound speed
+dfloor          = 1.e-9
+pfloor          = 1.e-12
+
+<orbital_advection>
+OAorder     = 2   # 0: w/o OA, 1: w/ OA (1st), 2: w/ OA (2nd)
+Omega0      = 0.0 # angular velocity of the system
+
+<meshblock>
+nx1 = 150
+nx2 = 78
+nx3 = 200
+
+<problem>
+GM          = 1.0
+r0          = 1.0
+rho0        = 1.0
+p0_over_r0  = 0.0025000000000000005
+sslope      = -1.5
+tslope      = 0
+
+GMp         = 3.125000000000001e-05
+rsm         = 0.005 # should be reset when the grid is changed
+tramp_start = 0
+tramp_dur   = 10
+tdamp       = 0.25            # damping time in orbital period
+rdampi      = 0.45             # damping zone locations
+rdampo      = 2.1
+

@@ -130,7 +130,8 @@ Mesh::Mesh(ParameterInput *pin, int mesh_test) :
     MGCRDiffusionCoeffBoundaryFunction_{nullptr, nullptr, nullptr,
                                         nullptr, nullptr, nullptr},
     MGGravitySourceMaskFunction_{}, MGCRDiffusionSourceMaskFunction_{},
-    MGCRDiffusionCoeffMaskFunction_{} {
+    MGCRDiffusionCoeffMaskFunction_{},
+    CustomAUWBO_{} {
   std::stringstream msg;
   BoundaryFlag block_bcs[6];
   std::int64_t nbmax;
@@ -680,7 +681,8 @@ Mesh::Mesh(ParameterInput *pin, IOWrapper& resfile, int mesh_test) :
     MGCRDiffusionCoeffBoundaryFunction_{nullptr, nullptr, nullptr,
                                         nullptr, nullptr, nullptr},
     MGGravitySourceMaskFunction_{}, MGCRDiffusionSourceMaskFunction_{},
-    MGCRDiffusionCoeffMaskFunction_{} {
+    MGCRDiffusionCoeffMaskFunction_{},
+    CustomAUWBO_{} {
   std::stringstream msg;
   BoundaryFlag block_bcs[6];
   IOWrapperSizeT *offset{};

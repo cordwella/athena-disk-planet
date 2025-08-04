@@ -1,7 +1,7 @@
 <comment>
-problem   = Diskplanet interactions
+problem   = 2D Disk Planet Interaction Problem
 reference =
-configure = --prob=diskplanet_2d --coord=cylindrical -hdf5 -omp
+configure = --prob=diskplanet_2d --coord=cylindrical -hdf5  -mpi --cxx icc --eos adiabatic --flux roe
 <job>
 problem_id = diskplanet # problem ID: basename of output filenames
 <output1>
@@ -31,7 +31,7 @@ dt               = 6.283185307e1
 <time>
 cfl_number       = 0.4   # The Courant, Friedrichs, & Lewy (CFL) Number
 nlim             = -1    # cycle limit
-tlim             = 126  # time limit (60 orbits)
+tlim             = 180  # time limit (60 orbits)
 integrator       = rk2   # time integration algorithm
 xorder           = 2     # order of spatial reconstruction
 ncycle_out       = 1     # interval for stdout summary info
@@ -43,13 +43,13 @@ correct_ic       = 0     # Default value added at run time
 correct_err      = 0     # Default value added at run time
 
 <mesh>
-nx1         = 450               # Number of zones in X1-direction
-x1min       = 0.5                # minimum value of X1
-x1max       = 2.0                # maximum value of X1
+nx1         = 1800               # Number of zones in X1-direction
+x1min       = 0.2                # minimum value of X1
+x1max       = 4.0                # maximum value of X1
 ix1_bc      = user               # Inner-X1 boundary condition flag
 ox1_bc      = user               # Outer-X1 boundary condition flag
-x1rat       = 1.003085404227318  # non-uniform grid ratio
-nx2         = 1800               # Number of zones in X2-direction
+x1rat       = 1.0016656814162674  # non-uniform grid ratio
+nx2         = 3600               # Number of zones in X2-direction
 x2min       = 0.                 # minimum value of X2
 x2max       = 6.28318530718      # maximum value of X2
 ix2_bc      = periodic           # Inner-X2 boundary condition flag
@@ -62,15 +62,14 @@ ox3_bc      = user               # Outer-X3 boundary condition flag
 refinement  = None
 x2rat       = 1                  # Default value added at run time
 x3rat       = 1                  # Default value added at run time
-num_threads = 12
 
 <meshblock>
-nx1 = 150
-nx2 = 450
+nx1 = 600
+nx2 = 300
 nx3 = 1   # Default value added at run time
 
 <hydro>
-gamma           = 1.0001       # gamma = C_p/C_v
+gamma           = 1.4       # gamma = C_p/C_v
 iso_sound_speed = 0.05        # isothermal sound speed
 dfloor          = 1.e-9
 pfloor          = 1.e-9
@@ -81,11 +80,11 @@ Omega0     = 0.0 # angular velocity of the system (in additional to keplerian ba
 
 <problem>
 GM              = 1.0
-GMp             = 3.125e-5          # In units of GM
-eps             = 0.6              # smoothing length in units of H
+GMp             = 3.125000000000001e-05          # In units of GM
+eps             = 0              # smoothing length in units of H 
 r0              = 1.0
 rho0            = 1.0e
-p0_over_rho0    = 0.0025             # pressure divided by density at R = R0 (i.e. h_p**2)
+p0_over_rho0    = 0.0025000000000000005             # pressure divided by density at R = R0 (i.e. h_p**2)
 dslope          = -1.5
 tslope          = 0         # temperature slope (-0.5 gives H/R=const background)
 tdamp           = 0.25             # damping timezones / OmegaK
@@ -100,6 +99,5 @@ dampaverage     = false
 beta            = 0                # beta cooling timescale
 alpha           = 0
 nu_iso          = 0                # This isn't actually the viscosity. That is set by alpha. This is a flag to turn it on.
-strict_iso      = true             # enforce strict isothermality
-potential_order = 2
-
+strict_iso      = false             # enforce strict isothermality
+potential_order = -2

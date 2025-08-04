@@ -6,11 +6,18 @@ Please see the [Athena++ main GitHub](https://github.com/PrincetonUniversity/ath
 up to date changes on the underlying hydrodynamics code.
 
 ## New feature overview
-This fork adds two new problem files, `diskplanet_3d_sph.cpp` and `diskplanet_2d.cpp`, and two additional utilities, one for the calculation of Bessel functions based off the Cephes library and the other for a custom radial output type (this is used in `diskplanet_2d.cpp` to output $F\_wave$ and $dT/dR$, and originally written for Cimerman & Rafikov 2021). In addition, compile scripts, slurm scripts, and input files are provided. These are designed for the University of Cambridge Faculty of Mathematics's [Swirles HPC Cluster](https://www.maths.cam.ac.uk/computing/faculty-hpc-system-swirles), but more generally I hope they can be used as a starting point for researchers begining to use Athena++ for planet-disc interaction problems. Those scripts can be found in the `cambridge_scripts` directory.
+This fork adds two new problem files, `diskplanet_3d_sph.cpp` and `diskplanet_2d.cpp`, and two additional utilities, one for the calculation of Bessel functions based off the Cephes library and the other for a custom radial output type (this is used in `diskplanet_2d.cpp` to output $F\_{wave}$ and $dT/dR$, and originally written for Cimerman & Rafikov 2021). In addition, compile scripts, slurm scripts, and input files are provided. These are designed for the University of Cambridge Faculty of Mathematics's [Swirles HPC Cluster](https://www.maths.cam.ac.uk/computing/faculty-hpc-system-swirles), but more generally I hope they can be used as a starting point for researchers begining to use Athena++ for planet-disc interaction problems. Those scripts can be found in the `cambridge_scripts` directory.
 
 It also adds a 1D output for 2D simulations. This output code is based on that of Nicolas Cimerman, developed for Cimerman & Rafikov (2021), "Planet-driven density waves in protoplanetary discs: Numerical verification of non-linear evolution theory"
 
+
+### Compiling on the Cambridge HPC Swirles cluster
+
+Run `sbatch cosmosx_compile_disk.sh`, in the `cambridge_scripts` directory.
+
 ### Setting up 2D planet-disc simulations
+
+See `cambridge_scripts/athinput.diskplanet_2d` for an example. 
 
 The potential $\Phi_{B, H\_p}$ is reccomended. Set this using
 ```
@@ -22,6 +29,12 @@ potential_order = 2
 eps = 0.65
 ```
 where `eps` is set to your smoothing length (0.65 is reccomended for the best match to the one-sided Lindblad torque).
+
+### Setting up 3D planet-disc simulations
+
+See `cambridge_scripts/athinput.diskplanet_3d` for an example. 
+
+(More usage details to be added).
 
 ## Citing this repository
 
