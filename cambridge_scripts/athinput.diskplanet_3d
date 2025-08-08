@@ -1,21 +1,21 @@
 <comment>
 problem   =  3D Disk Planet Interaction problem
-reference = 
+reference =  Cordwell, Ziampras, Brown & Rafikov (2025)
 configure = --prob=diskplanet_3d --coord=spherical_polar -hdf5 -mpi --cxx icc --eos adiabatic --flux roe
 
 <job>
 problem_id  = disksph      # problem ID: basename of output filenames
 
-
 <output1>
-file_type        = hdf5          # All data
+file_type        = hdf5          # Output all conserved variables every orbit
 variable         = cons          
 dt               = 6.283185307e0
 
 <output2>
-file_type   = hst       # History data dump
-dt          = 0.0628    # time increment between outputs
-<output5>
+file_type   = hst                # History data dump
+dt          = 0.0628    
+
+<output3>
 file_type        = rst           # Restart file
 dt               = 6.283185307e1
 
@@ -23,8 +23,8 @@ dt               = 6.283185307e1
 cfl_number  = 0.4       # The Courant, Friedrichs, & Lewy (CFL) Number
 nlim        = -1        # cycle limit
 tlim        = 126       # time limit 20 orbits
-integrator  = rk2   # time integration algorithm
-xorder      = 2     # order of spatial reconstruction
+integrator  = rk2       # time integration algorithm
+xorder      = 2        # order of spatial reconstruction
 ncycle_out  = 1         # interval for stdout summary info
 
 <mesh>
@@ -33,15 +33,13 @@ x1min       = 0.4       # minimum value of X1
 x1max       = 2.0       # maximum value of X1
 ix1_bc      = user      # Inner-X1 boundary condition flag
 ox1_bc      = user      # Outer-X1 boundary condition flag
-x1rat       = 1.0017898642453749  # non-uniform grid ratio
+x1rat       = 1.0017898642453749  # Non-uniform grid ratio: For deatil see https://github.com/PrincetonUniversity/athena/wiki/Coordinate-Systems-and-Meshes#mesh-spacing 
 
 nx2         = 78        # Number of zones in X2-direction
-x2min       = 1.5707963267948966    # minimum value of X2 NOTE: THIS IS SET PER H_p
-# should cover 3 h_p, currently set to 13 cells per scale height
-# later will be 26 per scale height
-x2max       = 1.7207963267948965    # maximum value of X
-ix2_bc      = reflecting      # Inner-X2 boundary condition flag
-ox2_bc      = reflecting      # Outer-X2 boundary condition flag
+x2min       = 1.5707963267948966    # minimum value of X2. Reccomened to be at least 3 hp
+x2max       = 1.7207963267948965    # maximum value of X2. I.e. pi/2 for a half disc simulation
+ix2_bc      = reflecting      # Reflecting BCs prevent boundary issues at the outer boundary
+ox2_bc      = reflecting      # Set half grid 
 
 nx3         = 3600            # Number of zones in X3-direction
 x3min       = 0.0            # minimum value of X3
@@ -51,8 +49,13 @@ ox3_bc      = periodic       # Outer-X3 boundary condition flag
 
 refinement  = None
 
+<meshblock>
+nx1 = 150  # Size of block passed to each processor 
+nx2 = 78
+nx3 = 300
+
 <hydro>
-gamma           = 1.0001 # gamma = C_p/C_v
+gamma           = 1.0001      # gamma = C_p/C_v. Used when code is configured as adiabatic 
 iso_sound_speed = 0.05        # isothermal sound speed
 dfloor          = 1.e-9
 pfloor          = 1.e-12
@@ -61,22 +64,18 @@ pfloor          = 1.e-12
 OAorder     = 2   # 0: w/o OA, 1: w/ OA (1st), 2: w/ OA (2nd)
 Omega0      = 0.0 # angular velocity of the system
 
-<meshblock>
-nx1 = 150
-nx2 = 78
-nx3 = 300
 
 <problem>
 GM          = 1.0
-r0          = 1.0
-sig0        = 2.0
-p0_over_r0  = 0.0025000000000000005
-sslope      = -1.5
-tslope      = 0
-GMp         = 1.2500000000000004e-05
-rsm         = 0.005 # 0.1 * scale height
-tramp_start = 0
-tramp_dur   = 10
-tdamp       = 0.25            # damping time in orbital period
+GMp         = 1.2500000000000004e-05 # Planetary mass
+r0          = 1.0                    # Planetary location
+sig0        = 2.0                    # Surface density (i.e. $\int \rho dz) at the loction of the planet 
+sslope      = -1.5                   # Surface density (not 3D density) slope
+tslope      = 0                      # Background temperature slope
+p0_over_r0  = 0.0025000000000000005  #
+rsm         = 0.005                  # Smoothing length (in units r0) for the planetary potential (default: 0.1 * scale height)
+tramp_start = 0                      # When to insert the planet (orbits)
+tramp_dur   = 10                     # Duration of planetary ramp up (in orbits)
 rdampi      = 0.45             # damping zone locations
 rdampo      = 1.8
+tdamp       = 0.25             # damping characteristic time in units of orbital period

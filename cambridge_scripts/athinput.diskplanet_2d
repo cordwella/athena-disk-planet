@@ -1,12 +1,12 @@
 <comment>
 problem   = 2D Disk Planet Interaction Problem
-reference =
+reference = Cordwell, Ziampras, Brown & Rafikov (2025)
 configure = --prob=diskplanet_2d --coord=cylindrical -hdf5  -mpi --cxx icc --eos adiabatic --flux roe
 <job>
 problem_id = diskplanet # problem ID: basename of output filenames
 <output1>
-file_type        = hdf5          # VTK data dump
-variable         = cons          #
+file_type        = hdf5          # Main output of conserved variables
+variable         = cons          
 dt               = 6.283185307e0
 
 <output2>
@@ -14,18 +14,20 @@ file_type        = hst            # History data dump
 dt               = 6.283185307e-1
 
 <output3>
-file_type        = hdf5           # VTK data dump
-variable         = x1av           #
+file_type        = hdf5           # 
+variable         = x1av           # Output of user defined quantities as a function of R. See lines 427+ in diskplanet_2d.cpp
+                                  # for descriptions of disc_planet_analysis for an example of working with these
+                                  # includes df_dep dT/dR etc
 dt               = 6.283185307e-1
 
 <output4>
-file_type        = hdf5           # VTK data dump
+file_type        = hdf5           # Summed conserved variables (e.g. surface density)
 variable         = cons           #
 dt               = 6.283185307e-1
 x2_sum           = true
 
 <output5>
-file_type        = rst           # VTK data dump
+file_type        = rst           # Include a restart file every 10 orbits 
 dt               = 6.283185307e1
 
 <time>
@@ -35,12 +37,12 @@ tlim             = 180  # time limit (60 orbits)
 integrator       = rk2   # time integration algorithm
 xorder           = 2     # order of spatial reconstruction
 ncycle_out       = 1     # interval for stdout summary info
-start_time       = 0     # Default value added at run time
-dt_diagnostics   = -1    # Default value added at run time
-sts_integrator   = rkl2  # Default value added at run time
-sts_max_dt_ratio = -1    # Default value added at run time
-correct_ic       = 0     # Default value added at run time
-correct_err      = 0     # Default value added at run time
+start_time       = 0     
+dt_diagnostics   = -1    
+sts_integrator   = rkl2  
+sts_max_dt_ratio = -1    
+correct_ic       = 0     
+correct_err      = 0     
 
 <mesh>
 nx1         = 1800               # Number of zones in X1-direction
@@ -48,56 +50,62 @@ x1min       = 0.2                # minimum value of X1
 x1max       = 4.0                # maximum value of X1
 ix1_bc      = user               # Inner-X1 boundary condition flag
 ox1_bc      = user               # Outer-X1 boundary condition flag
-x1rat       = 1.0016656814162674  # non-uniform grid ratio
+x1rat       = 1.001665681416267  # Non-uniform grid ratio - MUST BE UPDATED WHEN nx1 or boundaries are changed 
+                                 # For detail see: https://github.com/PrincetonUniversity/athena/wiki/Coordinate-Systems-and-Meshes#mesh-spacing
 nx2         = 3600               # Number of zones in X2-direction
 x2min       = 0.                 # minimum value of X2
 x2max       = 6.28318530718      # maximum value of X2
 ix2_bc      = periodic           # Inner-X2 boundary condition flag
 ox2_bc      = periodic           # Outer-X2 boundary condition flag
-nx3         = 1                  # Number of zones in X3-direction
+nx3         = 1                  # Fake Z co-ordinates
 x3min       = -0.4               # minimum value of X3
 x3max       = 0.4                # maximum value of X3
 ix3_bc      = user               # Inner-X3 boundary condition flag
 ox3_bc      = user               # Outer-X3 boundary condition flag
-refinement  = None
-x2rat       = 1                  # Default value added at run time
-x3rat       = 1                  # Default value added at run time
+x2rat       = 1                  
+x3rat       = 1                 
 
 <meshblock>
-nx1 = 600
+nx1 = 600       # Generally good to set this so that each CPU has one meshblock
 nx2 = 300
-nx3 = 1   # Default value added at run time
+nx3 = 1 
 
 <hydro>
-gamma           = 1.4       # gamma = C_p/C_v
-iso_sound_speed = 0.05        # isothermal sound speed
+gamma           = 1.4         # gamma = C_p/C_v - for adiabatic runs 
+iso_sound_speed = 0.05        # isothermal sound speed - for globally isothermal runs
 dfloor          = 1.e-9
 pfloor          = 1.e-9
 
 <orbital_advection>
-OAorder    = 2   # 0: w/o OA, 1: w/ OA (1st), 2: w/ OA (2nd)
-Omega0     = 0.0 # angular velocity of the system (in additional to keplerian background)
+OAorder    = 2                 # 0: w/o OA, 1: w/ OA (1st), 2: w/ OA (2nd)
+Omega0     = 0.0               # angular velocity of the system (in additional to the keplerian background)
 
 <problem>
-GM              = 1.0
-GMp             = 3.125000000000001e-05          # In units of GM
-eps             = 0              # smoothing length in units of H 
-r0              = 1.0
-rho0            = 1.0e
-p0_over_rho0    = 0.0025000000000000005             # pressure divided by density at R = R0 (i.e. h_p**2)
-dslope          = -1.5
-tslope          = 0         # temperature slope (-0.5 gives H/R=const background)
-tdamp           = 0.25             # damping timezones / OmegaK
-rdampi          = 0.28             # damping zone locations
-rdampo          = 3.4
-tramp           = 10.0             # timescale to ramp planetary potential
-trampdamp       = 0.5              # timescale to ramp up damping zones
-damping         = true             # damping zones flag
-dampdens        = true
-dampthermal     = true
-dampaverage     = false
-beta            = 0                # beta cooling timescale
-alpha           = 0
-nu_iso          = 0                # This isn't actually the viscosity. That is set by alpha. This is a flag to turn it on.
-strict_iso      = false             # enforce strict isothermality
-potential_order = -2
+GM              = 1.0                            # Stellar mass
+GMp             = 3.125e-05                      # Planetary Mass
+potential_order = -2                             # Treatment of the planetary potential
+# options are 4 (fourth order smoothed), 2 (second order smoothed), -1 ($F_B$ integrated force, not reccomended), -2 ($\Phi_{B, H_p}$, reccomended)
+# -3 ($\Phi_{B}, acceptable), -4 ($F_{B, lin}$, not reccomended)
+# See Cordwell, Ziampras, Brown & Rafikov 2025 for further detail
+eps             = 0                               # smoothing length (b) in units of H for second or fourth order potentials
+tramp           = 10.0                            # Number of orbits over which to ramp up the planetary potential
+
+r0              = 1.0                             # Radial location of the planet. Changing this has not been tested
+rho0            = 1.0e                            # Surface density at the planet
+p0_over_rho0    = 0.0025                          # pressure divided by density at R = r0 (i.e. h_p**2)
+dslope          = -1.5                            # Density slope $\Sigma_0 = rho0 (R/r_0)^(dslope)$
+tslope          = 0                               # Temperature slope (-0.5 gives H/R=const background)
+
+alpha           = 0                 # Sets viscosity based on $\nu = alpha c_s H$
+nu_iso          = 0                 # Enable viscosity by setting to 1, or disable by setting to zero
+beta            = 0                 # Beta cooling timescale. If this is set to zero no cooling will occur. Enforce strict isothermality with the next flag.
+strict_iso      = false             # Enforce strict isothermality (reset temperature every timestep)
+
+rdampi          = 0.28              # Radial location of inner damping zone
+rdampo          = 3.4               # Radial location of outer damping zone
+tdamp           = 0.25              # Characteristic damping timescale for damping zones. Actual damping timescale is this/Omega_K 
+trampdamp       = 0.5               # timescale to ramp up damping zones
+damping         = true              # damping zones flag
+dampdens        = true              # Damp density (and not just velocity) in the damping zones
+dampthermal     = true              # Damp thermal energy (and not just velocity) in the damping zones
+dampaverage     = false             # Damp to azimuthal averages (slower, requires extra MPI calls during each timestep, only reccomended for VSS projects)

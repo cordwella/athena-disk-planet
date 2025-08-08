@@ -17,7 +17,7 @@ Run `sbatch cosmosx_compile_disk.sh`, in the `cambridge_scripts` directory.
 
 ### Setting up 2D planet-disc simulations
 
-See `cambridge_scripts/athinput.diskplanet_2d` for an example. 
+See `cambridge_scripts/athinput.diskplanet_2d` for an example with comments indicating what each parameter would mean.
 
 The potential $\Phi_{B, H\_p}$ is reccomended. Set this using
 ```
@@ -32,9 +32,7 @@ where `eps` is set to your smoothing length (0.65 is reccomended for the best ma
 
 ### Setting up 3D planet-disc simulations
 
-See `cambridge_scripts/athinput.diskplanet_3d` for an example. 
-
-(More usage details to be added).
+See `cambridge_scripts/athinput.diskplanet_3d` for an example with comments indicating what each parameter would mean.
 
 ## Citing this repository
 
